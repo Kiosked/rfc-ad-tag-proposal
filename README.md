@@ -16,6 +16,14 @@ Ads don't usually talk to us, so we don't have any real reliable way of detectin
 
 > In such a case, the event is always triggered and it's even triggered before the network has answered. But the network might be unable to fill the slot and the ad unit remains empty.
 
+There seems to be no current *standard* way of approaching the problem of loaded/rendered detection for an ad. This proposal discusses ways of solving this through implementation of new infrastructure for client-side ad tags.
+
+## Structure
+As there are several different ways of managing bi-directional events for ad tags, this proposal includes a number of potential solutions. Each solution follows the same basic flow of information and interaction.
+
+Currently ad tags are created by writing a `<script>` to the DOM, which can either request a remote script or execute in-line code. Both of these options result in advertiser code running in the current frame of placement, which means that support for event callbacks should be trivial. Having certain events like when the ad has **filled**, **passed-back** or **errored** would prove to be invaluable to players that manage some kind of user-experience standard for their platforms. Let's call this link **ad-to-page**.
+
+Network ad tags can sometimes fire visibility pixels or scripts that detect how much of the ad is in view, but depending on how and where the ad is shown, this can prove to be inaccurate. Delaying the visibility/impression tracking should be made possible for such complex integrations into advertising systems (such as Kiosked's) so that both paid ad impressions and visibility measurements are accurate. This would allow ads to be presented **in a controlled, designed manner** that would not negatively affect the advertiser or intermediaries. Providing a way to indicate to the ad when it should process it's visibility measurements could be made by sending an event to the ad placement itself. Let's call this link **page-to-ad**.
 
 [1]: http://stackoverflow.com/questions/10781880/dynamically-crated-iframe-triggers-onload-event-twice
 [2]: https://msdn.microsoft.com/library/hh180173(v=vs.85).aspx
