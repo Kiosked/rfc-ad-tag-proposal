@@ -25,6 +25,25 @@ Currently ad tags are created by writing a `<script>` to the DOM, which can eith
 
 Network ad tags can sometimes fire visibility pixels or scripts that detect how much of the ad is in view, but depending on how and where the ad is shown, this can prove to be inaccurate. Delaying the visibility/impression tracking should be made possible for such complex integrations into advertising systems (such as Kiosked's) so that both paid ad impressions and visibility measurements are accurate. This would allow ads to be presented **in a controlled, designed manner** that would not negatively affect the advertiser or intermediaries. Providing a way to indicate to the ad when it should process it's visibility measurements could be made by sending an event to the ad placement itself. Let's call this link **page-to-ad**.
 
+### Propagation
+Because ad tags may be nested, there is a strong necessity for all tags to both support this proposal's event-driven upgrades aswell as the ability to propagate events up and down the chain of ad tags.
+
+For instance, if we had networks A, B and C, and A had been placed on the page (with B and C being nested therein), we'd see propagation similar to this:
+
+```
+A <--> B <--> C
+```
+
+A passes upwards to B, and B to C, then C downwards to B, and B to A. A would then be the interface with the page or controlling application.
+
+### Ad-to-page
+Having events sent from the ad placement to some kind of script in the containing frame or page would allow applications to respond to what the ads are doing. Ads are an element in the UI, and because they can passback or fill, the containing application should be able to react to how the ad resolves. If an ad passes-back, an empty space is left that the application can do nothing about.
+
+There are some events that would be trivial to implement that would allow for powerful detection of ad state:
+ * "ad_fill": An ad has filled and rendered content (**visible to the user**)
+ * "ad_passback": An ad was unable to fill, and passback functionality should ensue
+ * "ad_error": An ad encountered a fatal error (nothing should be shown)
+
 [1]: http://stackoverflow.com/questions/10781880/dynamically-crated-iframe-triggers-onload-event-twice
 [2]: https://msdn.microsoft.com/library/hh180173(v=vs.85).aspx
 [3]: https://www.experts-exchange.com/questions/21975584/IFRAME-loads-twice-on-refresh.html
